@@ -28,6 +28,7 @@ router.post('/signup', (req, res) => {
         username: req.body.username,
         password: hash,
         isAdmin: req.body.isAdmin,
+        isVerified: req.body.isVerified,
 
         token: uid2(32),
       });
@@ -36,7 +37,7 @@ router.post('/signup', (req, res) => {
         res.json({ result: true, token: newDoc.token });
       });
     } else {
-      // User already exists in database
+      
       res.json({ result: false, error: "L'utilisateur existe déjà" });
     }
   });
@@ -56,6 +57,24 @@ router.post('/signin', (req, res) => {
     }
   });
 });
+
+router.delete('/deleteUser', (req, res) => {
+  const userEmail = req.body.email; 
+
+  // Retire l'utilisateur de la bdd
+  User.findOneAndDelete({ email: userEmail })
+    .then(doc => {
+      if (!doc) {
+        res.json({ result: false, error: 'Utilisateur introuvable' });
+      } else {
+        res.json({ result: true, message: 'Utilisateur supprimé avec succès' });
+      }
+    })
+    .catch(err => {
+      res.json({ result: false, error: 'Erreur lors de la suppression de l\'utilisateur' });
+    });
+});
+
 
 
 

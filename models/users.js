@@ -25,7 +25,12 @@ const userSchema = mongoose.Schema({
   },
   
   likes: Boolean,
-  favoriteSong: Boolean,
+  favoriteSong: String,
+
+  IsVerified:{
+    type: Boolean,
+    default: false,
+  }
 
 });
 
