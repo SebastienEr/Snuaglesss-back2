@@ -27,6 +27,7 @@ router.post("/signup", (req, res) => {
         password: hash,
         isAdmin: req.body.isAdmin,
         isVerified: req.body.isVerified,
+        isBanned: req.body.isBanned,
 
         token: uid2(32),
       });
@@ -46,14 +47,19 @@ router.post("/signin", (req, res) => {
     return;
   }
 
-  User.findOne({ username: req.body.username }).then((data) => {
-    if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, token: data.token });
+  User.findOne({ username: req.body.username }).then((user) => {
+    if (!user) {
+      res.json({ result: false, error: "Utilisateur introuvable" });
+    } else if (user.isBanned) {
+      if (user.token) {
+        user.token = undefined;
+        user.save();
+      }
+      res.json({ result: false, error: "Cet utilisateur est banni" });
+    } else if (bcrypt.compareSync(req.body.password, user.password)) {
+      res.json({ result: true, token: user.token });
     } else {
-      res.json({
-        result: false,
-        error: "Utilisateur introuvable ou mot de passe erroné",
-      });
+      res.json({ result: false, error: "Mot de passe incorrect" });
     }
   });
 });

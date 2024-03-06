@@ -22,11 +22,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-app.use("/chat", chatRouter);
+// app.use("/chat", chatRouter);
 app.use("/users", usersRouter);
 app.use("/message", messageRouter);
 app.use("/email", sendEmailRouter);
 app.use("/changepassword", changepassword);
 app.use("/forgetpassword", forgetpassword);
+app.use("/banuser", banuser);
 
 module.exports = app;
