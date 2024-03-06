@@ -12,6 +12,11 @@ var sendEmailRouter = require("./routes/email");
 var changepassword = require("./routes/changepassword");
 var forgetpassword = require("./routes/forgetpassword");
 var banuser = require("./routes/banuser");
+var chatRouter = require("./routes/chat");
+var messageRouter = require("./routes/message");
+var sendEmailRouter = require("./routes/email");
+var changepassword = require("./routes/changepassword");
+var forgetpassword = require("./routes/forgetpassword");
 
 var app = express();
 const cors = require("cors");
