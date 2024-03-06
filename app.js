@@ -6,11 +6,11 @@ require("./models/connection");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var messageRouter= require("./routes/message");
-var sendEmailRouter= require('./routes/email');
-var changepassword= require('./routes/changepassword');
-var forgetpassword= require('./routes/forgetpassword');
-
+var chatRouter = require("./routes/chat");
+var messageRouter = require("./routes/message");
+var sendEmailRouter = require("./routes/email");
+var changepassword = require("./routes/changepassword");
+var forgetpassword = require("./routes/forgetpassword");
 
 var app = express();
 const cors = require("cors");
@@ -24,9 +24,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/chat", chatRouter);
 app.use("/users", usersRouter);
-app.use("/message", messageRouter)
-app.use('/email', sendEmailRouter);
-app.use('/changepassword', changepassword)
-app.use('/forgetpassword', forgetpassword)
+app.use("/message", messageRouter);
+app.use("/email", sendEmailRouter);
+app.use("/changepassword", changepassword);
+app.use("/forgetpassword", forgetpassword);
 
 module.exports = app;
