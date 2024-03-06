@@ -10,6 +10,7 @@ var messageRouter= require("./routes/message");
 var sendEmailRouter= require('./routes/email');
 var changepassword= require('./routes/changepassword');
 var forgetpassword= require('./routes/forgetpassword');
+var banuser= require('./routes/banuser');
 
 
 var app = express();
@@ -22,11 +23,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-app.use("/chat", chatRouter);
+// app.use("/chat", chatRouter);
 app.use("/users", usersRouter);
 app.use("/message", messageRouter)
 app.use('/email', sendEmailRouter);
 app.use('/changepassword', changepassword)
 app.use('/forgetpassword', forgetpassword)
+app.use('/banuser', banuser)
 
 module.exports = app;
