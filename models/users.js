@@ -30,7 +30,17 @@ const userSchema = mongoose.Schema({
   IsVerified:{
     type: Boolean,
     default: false,
-  }
+  },
+
+  isBanned:{
+    type: Boolean,
+    default: false,
+  },
+
+//   confirmationToken: {
+//     type: String
+   
+//   }
 
 });
 

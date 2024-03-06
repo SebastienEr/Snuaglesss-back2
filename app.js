@@ -11,6 +11,7 @@ var chatRouter = require("./routes/chat");
 var sendEmailRouter = require("./routes/email");
 var changepassword = require("./routes/changepassword");
 var forgetpassword = require("./routes/forgetpassword");
+var banuser = require("./routes/banuser");
 
 var app = express();
 const cors = require("cors");
@@ -22,7 +23,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-app.use("/chat", chatRouter);
+// app.use("/chat", chatRouter);
 app.use("/users", usersRouter);
 app.use("/message", messageRouter);
 app.use("/email", sendEmailRouter);
