@@ -37,10 +37,10 @@ const userSchema = mongoose.Schema({
     default: false,
   },
 
-//   confirmationToken: {
-//     type: String
+  verificationToken: {
+    type: String
    
-//   }
+  }
 
 });
 
