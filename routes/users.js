@@ -10,6 +10,8 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const uniqid = require("uniqid");
 
+require("dotenv").config(); // Make sure to add this line at the top of your file
+
 router.post("/signup", (req, res) => {
   if (!checkBody({ ...req.body }, ["email", "username", "password"])) {
     res.json({ result: false, error: "Champs manquants ou vides" });
@@ -28,7 +30,7 @@ router.post("/signup", (req, res) => {
         isAdmin: req.body.isAdmin,
         isVerified: req.body.isVerified,
         isBanned: req.body.isBanned,
-
+        image: null,
         token: uid2(32),
       });
 
@@ -84,8 +86,9 @@ router.delete("/deleteUser", (req, res) => {
     });
 });
 
-router.post("/upload/:userId", async (req, res) => {
-  const userId = req.params.userId;
+router.post("/upload/:token", async (req, res) => {
+  const token = req.params.token;
+  console.log(req.files);
 
   if (!req.files || !req.files.image) {
     return res.status(400).json({ result: false, error: "No file uploaded" });
@@ -96,8 +99,8 @@ router.post("/upload/:userId", async (req, res) => {
   if (!resultMove) {
     const resultCloudinary = await cloudinary.uploader.upload(photoPath);
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      { image: resultCloudinary.secure_url },
+      { token: token },
+      { profilePic: resultCloudinary.secure_url },
       { new: true }
     );
     res.json({
