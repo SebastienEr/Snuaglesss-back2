@@ -1429,7 +1429,7 @@ expect@^29.7.0:
 
 express-fileupload@^1.4.3:
   version "1.4.3"
-  resolved "https://registry.npmjs.org/express-fileupload/-/express-fileupload-1.4.3.tgz"
+  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.4.3.tgz#32cbb405ba12f541d445838464e081defba4ef61"
   integrity sha512-vRzZo2YELm68DfR/CX8RMXgeK9BTAANxigrKACPjCXFGEzkCt/QWbqaIXP3W61uaX/hLj0CAo3/EVelpSQXkqA==
   dependencies:
     busboy "^1.6.0"

@@ -19,6 +19,8 @@ var changepassword = require("./routes/changepassword");
 var forgetpassword = require("./routes/forgetpassword");
 
 var app = express();
+const fileUpload = require("express-fileupload");
+app.use(fileUpload());
 const cors = require("cors");
 app.use(cors());
 app.use(logger("dev"));
@@ -28,7 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-// app.use("/chat", chatRouter);
+app.use("/chat", chatRouter);
 app.use("/users", usersRouter);
 app.use("/message", messageRouter);
 app.use("/email", sendEmailRouter);
