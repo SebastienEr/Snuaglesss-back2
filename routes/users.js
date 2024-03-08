@@ -46,7 +46,8 @@ router.post("/signup", (req, res) => {
     return;
   }
 
-  User.findOne({ username: req.body.username }).then((data) => {
+  User.findOne({ username: req.body.username })
+  .then((data) => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
       const verificationToken = uid2(32);
@@ -54,11 +55,16 @@ router.post("/signup", (req, res) => {
         email: req.body.email,
         username: req.body.username,
         password: hash,
-        isAdmin: false, 
+        isAdmin: req.body.isAdmin,
+        isVerified: req.body.isVerified,
+        isBanned: req.body.isBanned,
+        image: null,
+        token: uid2(32),
+        isAdmin: false,
         isVerified: false,
         isBanned: false,
-        verificationToken: verificationToken, 
-      });
+        verificationToken: verificationToken,
+      }); 
 
       newUser.save().then((newDoc) => {
         sendVerificationEmail(req.body.email, verificationToken);

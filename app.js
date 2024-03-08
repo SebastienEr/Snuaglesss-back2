@@ -13,6 +13,7 @@ var forgetpassword= require('./routes/forgetpassword');
 var banuser= require('./routes/banuser');
 
 
+
 var app = express();
 const cors = require("cors");
 app.use(cors());
