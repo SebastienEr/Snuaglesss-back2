@@ -8,6 +8,7 @@ const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 const sgMail = require("@sendgrid/mail");
 
+
 sgMail.setApiKey(
   "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"
 );
@@ -173,5 +174,84 @@ router.post("/upload/:token", async (req, res) => {
 
   fs.unlinkSync(photoPath);
 });
+
+
+
+
+const handleResetPassword = (e) => {
+  e.preventDefault();
+  const email = getEmailFromSomeInput();
+  const token = generateToken();
+
+  fetch('/reset-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, token }),
+  })
+    .then(response => {
+      if (response.ok) {
+        router.push('/ResetPasswordPageWrapped');
+      } else {
+        return response.text().then(errorMessage => {
+          throw new Error(errorMessage);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Erreur lors de l\'envoi de l\'e-mail:', error.toString());
+    });
+};
+
+router.post('/reset-password', (req, res) => {
+  const { email, token } = req.body;
+
+  if (!email) {
+    return res.status(400).send('Email requis');
+  }
+
+  User.findOne({ email })
+    .then(user => {
+      if (!user) {
+        return res.status(404).send('Utilisateur non trouvé');
+      }
+
+      return sendPasswordChangeEmail(email, token)
+        .then(() => {
+          console.log('E-mail envoyé avec succès');
+          res.status(200).send('E-mail de réinitialisation envoyé avec succès.');
+        })
+        .catch((error) => {
+          console.error('Erreur lors de l\'envoi de l\'e-mail:', error.toString());
+          res.status(500).send('Erreur lors de l\'envoi de l\'e-mail.');
+        });
+    })
+    .catch(err => {
+      console.error('Erreur lors de la recherche de l\'utilisateur:', err);
+      res.status(500).send('Erreur lors de la recherche de l\'utilisateur');
+    });
+});
+
+function sendPasswordChangeEmail(email, token) {
+  const passwordChangeUrl = `http://localhost:3001/ResetPasswordPageWrapped?token=${token}`;
+
+  const msg = {
+    to: email,
+    from: 'radio@snuagless.com', 
+    subject: 'Réinitialisation de mot de passe',
+    text: 'Voici votre e-mail de réinitialisation de mot de passe.',
+    html: `<p>Cliquez sur ce lien pour changer votre mot de passe : <a href="${passwordChangeUrl}">${passwordChangeUrl}</a></p>`,
+  };
+
+  return sgMail.send(msg);
+}
+
+
+
+
+
+
+
 
 module.exports = router;
