@@ -30,6 +30,10 @@ router.post("/:name/messages", function (req, res) {
   pusherClient.trigger("chat_channel", "message", {
     name: req.params.name,
     message: req.body.message,
+    time: req.body.time,
+    image: req.body.image,
+    token: req.body.token,
+    id: req.body.id,
   });
   res.sendStatus(204);
 });
