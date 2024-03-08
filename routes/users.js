@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 require("../models/connection");
+
 const User = require("../models/users");
 // const { checkBody } = require("../modules/checkBody");
 const uid2 = require("uid2");
@@ -127,23 +128,14 @@ router.post("/signin", (req, res) => {
 });
 
 router.delete("/deleteUser", (req, res) => {
-  const userEmail = req.body.email;
-
   // Retire l'utilisateur de la bdd
-  User.findOneAndDelete({ email: userEmail })
-    .then((doc) => {
-      if (!doc) {
-        res.json({ result: false, error: "Utilisateur introuvable" });
-      } else {
-        res.json({ result: true, message: "Utilisateur supprimé avec succès" });
-      }
-    })
-    .catch((err) => {
-      res.json({
-        result: false,
-        error: "Erreur lors de la suppression de l'utilisateur",
-      });
-    });
+  console.log(req.body.token);
+  User.findOneAndDelete({ verificationToken: req.body.token }).then((doc) => {
+    console.log(doc);
+    {
+      res.json({ result: true, message: "Utilisateur supprimé avec succès" });
+    }
+  });
 });
 
 router.post("/upload/:token", async (req, res) => {
