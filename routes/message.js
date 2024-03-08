@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 require("../models/connection");
-const Message = require("../models/message");
+const Message = require("../models/messages");
 
 router.post("/message", (req, res) => {
   const { username, texte, heure, profilPic, isReported } = req.body;
