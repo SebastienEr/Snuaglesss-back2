@@ -49,20 +49,6 @@ router.post("/:name/messages", async function (req, res) {
   res.sendStatus(204);
 });
 
-// router.get("/messages", async (req, res) => {
-//   const messages = await Message.find().populate({
-//     path: "user",
-//     select: "username profilePic",
-//   });
-
-//   console.log("Fetching messages...");
-//   if (!messages) {
-//     return pusherClient.trigger("chat_channel", "fetch", { messages: [] });
-//   }
-//   pusherClient.trigger("chat_channel", "fetch", { messages });
-//   res.sendStatus(204);
-// });
-
 router.get("/messages/:username", async (req, res) => {
   const { username } = req.params;
   const messages = await Message.find().populate({
@@ -85,18 +71,5 @@ router.get("/messages/:username", async (req, res) => {
 
   return res.json({ messages, username });
 });
-
-// router.get("/messages", async (req, res) => {
-//   const messages = await Message.find().populate({
-//     path: "user",
-//     select: "username profilePic",
-//   });
-
-//   if (messages) {
-//     return res.status(200).json(messages);
-//   }
-
-//   return res.status(500).json({ message: error });
-// });
 
 module.exports = router;

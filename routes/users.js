@@ -1,3 +1,4 @@
+require("dotenv").config(); // Make sure to add this line at the top of your file
 var express = require("express");
 var router = express.Router();
 
@@ -37,7 +38,11 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const uniqid = require("uniqid");
 
-require("dotenv").config(); // Make sure to add this line at the top of your file
+cloudinary.config({
+  cloud_name: "dib0gfrt9",
+  api_key: "674822684777143",
+  api_secret: "7nlIX1uV-b3kewhaKZmfbBb-RkM",
+});
 
 router.post("/signup", (req, res) => {
   if (!checkBody({ ...req.body }, ["email", "username", "password"])) {
@@ -116,7 +121,7 @@ router.post("/signin", (req, res) => {
       }
       res.json({ result: false, error: "Cet utilisateur est banni" });
     } else if (bcrypt.compareSync(req.body.password, user.password)) {
-      res.json({ result: true, token: user.token });
+      res.json({ result: true, token: user.token, user });
     } else {
       res.json({ result: false, error: "Mot de passe incorrect" });
     }
@@ -133,34 +138,39 @@ router.delete("/deleteUser", (req, res) => {
     }
   });
 });
-
 router.post("/upload/:token", async (req, res) => {
   const token = req.params.token;
   console.log(req.files);
 
-  if (!req.files || !req.files.image) {
-    return res.status(400).json({ result: false, error: "No file uploaded" });
-  }
-  const photoPath = `./temp/${uniqid()}.jpg`;
-  const resultMove = await req.files.image.mv(photoPath);
+  try {
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ result: false, error: "No file uploaded" });
+    }
 
-  if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-    const updatedUser = await User.findOneAndUpdate(
-      { token: token },
-      { profilePic: resultCloudinary.secure_url },
-      { new: true }
-    );
-    res.json({
-      result: true,
-      url: resultCloudinary.secure_url,
-      user: updatedUser,
-    });
-  } else {
-    res.json({ result: false, error: resultMove });
-  }
+    const photoPath = `./temp/${uniqid()}.jpg`;
+    const resultMove = await req.files.image.mv(photoPath);
 
-  fs.unlinkSync(photoPath);
+    if (!resultMove) {
+      const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+      const updatedUser = await User.findOneAndUpdate(
+        { token: token },
+        { profilePic: resultCloudinary.secure_url },
+        { new: true }
+      );
+      res.json({
+        result: true,
+        url: resultCloudinary.secure_url,
+        user: updatedUser,
+      });
+    } else {
+      res.json({ result: false, error: resultMove });
+    }
+
+    fs.unlinkSync(photoPath);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ result: false, error: "Internal server error" });
+  }
 });
 
 // const handleResetPassword = (e) => {
@@ -189,8 +199,9 @@ router.post("/upload/:token", async (req, res) => {
 //     });
 // };
 
+// Route post reset-password = mecanique d'envoie de mail
 router.post("/reset-password", (req, res) => {
-  const email = req.body.email;
+  const { email } = req.body;
 
   if (!email) {
     return res.status(400).send("Email requis");
@@ -212,6 +223,11 @@ router.post("/reset-password", (req, res) => {
             .send("E-mail de réinitialisation envoyé avec succès.");
         })
         .catch((error) => {
+          console.error(
+            "Erreur lors de l'envoi de l'e-mail:",
+            error.toString()
+          );
+          res.status(500).send("Erreur lors de l'envoi de l'e-mail.");
           console.error(
             "Erreur lors de l'envoi de l'e-mail:",
             error.toString()
