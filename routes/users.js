@@ -163,31 +163,31 @@ router.post("/upload/:token", async (req, res) => {
   fs.unlinkSync(photoPath);
 });
 
-/* const handleResetPassword = (e) => {
-  e.preventDefault();
-  const email = getEmailFromSomeInput();
-  const token = generateToken();
+// const handleResetPassword = (e) => {
+//   e.preventDefault();
+//   const email = getEmailFromSomeInput();
+//   const token = generateToken();
 
-  fetch("/reset-password", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, token }),
-  })
-    .then((response) => {
-      if (response.ok) {
-        router.push("/ResetPasswordPageWrapped");
-      } else {
-        return response.text().then((errorMessage) => {
-          throw new Error(errorMessage);
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Erreur lors de l'envoi de l'e-mail:", error.toString());
-    });
-}; */
+//   fetch('/reset-password', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({ email, token }),
+//   })
+//     .then(response => {
+//       if (response.ok) {
+//         router.push('/ResetPasswordPageWrapped');
+//       } else {
+//         return response.text().then(errorMessage => {
+//           throw new Error(errorMessage);
+//         });
+//       }
+//     })
+//     .catch(error => {
+//       console.error('Erreur lors de l\'envoi de l\'e-mail:', error.toString());
+//     });
+// };
 
 router.post("/reset-password", (req, res) => {
   const email = req.body.email;
@@ -196,13 +196,15 @@ router.post("/reset-password", (req, res) => {
     return res.status(400).send("Email requis");
   }
 
-  User.findOne({ email: email, token })
+  User.findOne({ email: email })
     .then((user) => {
-      const token = user.token;
       if (!user) {
         return res.status(404).send("Utilisateur non trouvé");
       }
-      return sendPasswordChangeEmail(email, token)
+
+      const userToken = user.token;
+
+      return sendPasswordChangeEmail(email, userToken)
         .then(() => {
           console.log("E-mail envoyé avec succès");
           res

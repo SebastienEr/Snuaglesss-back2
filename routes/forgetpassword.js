@@ -1,38 +1,28 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const sgMail = require('@sendgrid/mail');
-
 const router = express.Router();
+const bcrypt = require('bcrypt');
+const uid2 = require('uid2');
+const User = require('../models/users'); 
 
-sgMail.setApiKey('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');
+router.post('/forgetpassword', async (req, res) => {
+  const { token, newPassword } = req.body;
 
-router.use(bodyParser.json());
+  try {
+    const user = await User.findOne({ token: token });
+    if (!user) {
+      return res.status(500).send("Erreur lors de la recherche de l'utilisateur.");
+    }
 
-router.post('/forgetpassword', (req, res) => {
-  const { to, templateId, subject  } = req.body; 
+    const hash = await bcrypt.hash(newPassword, 10);
+    user.password = hash;
+    user.token = uid2(32); 
 
-  if (!to ) { 
-
-    return res.status(400).json({ error: 'Veuillez fournir tous les champs obligatoires.' });
+    await user.save();
+    res.send("Mot de passe mis à jour avec succès.");
+  } catch (error) {
+    console.error(error.toString());
+    res.status(500).send("Une erreur s'est produite lors de la réinitialisation du mot de passe.");
   }
-
-  const msg = {
-    to,
-    from: 'radio@snuagless.com', 
-    subject: "Demande de réinitialisation de mot de passe", // Définir le sujet ici
-    templateId: 'd-2baa9f0e923c419cbc7552d5e432e034',
-
-  };
-  
-
-  sgMail.send(msg)
-    .then(() => {
-      res.status(200).json({ message: 'E-mail envoyé avec succès.' });
-    })
-    .catch((error) => {
-      console.error(error.toString());
-      res.status(500).json({ error: "Une erreur s'est produite lors de l'envoi de l'e-mail." });
-    });
 });
 
 module.exports = router;
