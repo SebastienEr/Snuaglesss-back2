@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const User = require('../models/users');
 
-router.post('/changepassword', (req, res) => {
+router.post('/changepassword', (req, res) => { //Route pour modifier son mot de passe en étant connecté (actuellement pas utilisé mais elle est la )
     const { username, newPassword } = req.body;
 
     // Hacher le nouveau mot de passe

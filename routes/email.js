@@ -11,10 +11,10 @@ sgMail.setApiKey('SG.68J4UXz0SYuQm3jFqD8lgQ.1kdDu28MlIukZA2WhryWLyx8LHegw4yZdb8c
 router.use(bodyParser.json());
 
 
-router.post('/email', (req, res) => {
-  const { to, templateId } = req.body;
-
- 
+router.post('/email', (req, res) => { //Cette route sert a envoyer un e-mail à une adresse spécifiée lors de l'inscription, 
+  const { to, templateId } = req.body; // en utilisant l'API SendGrid, avec gestion des erreurs et des succès.
+                                       // elle se declenche au clic sur le bouton pour signup
+  
   if (!to ) {
     return res.status(400).json({ error: 'Please provide all required fields.' });
   }
