@@ -4,7 +4,9 @@ const dbURL =
   "mongodb+srv://admin2:KAWABUNGA@cluster0.nu2rhsw.mongodb.net/snuagless-radio";
 
 mongoose
-  .connect(dbURL)
+  .connect(
+    "mongodb+srv://admin2:KAWABUNGA@cluster0.nu2rhsw.mongodb.net/snuagless-radio"
+  )
   .then(() => {
     console.log("Connexion à la base de données réussie");
   })

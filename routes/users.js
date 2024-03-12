@@ -1,3 +1,4 @@
+require("dotenv").config(); // Make sure to add this line at the top of your file
 var express = require("express");
 var router = express.Router();
 
@@ -40,11 +41,15 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const uniqid = require("uniqid");
 
+cloudinary.config({
+  cloud_name: "dib0gfrt9",
+  api_key: "674822684777143",
+  api_secret: "7nlIX1uV-b3kewhaKZmfbBb-RkM",
+});
 
-
-router.post("/signup", (req, res) => {                                  //Permet l'inscription d'utilisateurs en vérifiant les champs requis, 
-  if (!checkBody({ ...req.body }, ["email", "username", "password"])) { //créant un nouvel utilisateur dans la base de données, envoyant un e-mail de vérification
-    res.json({ result: false, error: "Champs manquants ou vides" });    //et renvoyant un token d'authentification en cas de succès.
+router.post("/signup", (req, res) => {
+  if (!checkBody({ ...req.body }, ["email", "username", "password"])) {
+    res.json({ result: false, error: "Champs manquants ou vides" });
     return;
   }
 
@@ -62,9 +67,6 @@ router.post("/signup", (req, res) => {                                  //Permet
           isBanned: req.body.isBanned,
           image: null,
           token: uid2(32),
-          isAdmin: false,
-          isVerified: false,
-          isBanned: false,
           verificationToken: verificationToken,
         });
 
@@ -122,7 +124,7 @@ router.post("/signin", (req, res) => {                  // Gère la connexion de
       }
       res.json({ result: false, error: "Cet utilisateur est banni" });
     } else if (bcrypt.compareSync(req.body.password, user.password)) {
-      res.json({ result: true, token: user.token });
+      res.json({ result: true, token: user.token, user });
     } else {
       res.json({ result: false, error: "Mot de passe incorrect" });
     }
@@ -139,34 +141,39 @@ router.delete("/deleteUser", (req, res) => {  // Supprime un utilisateur de la b
     }
   });
 });
-
 router.post("/upload/:token", async (req, res) => {
   const token = req.params.token;
   console.log(req.files);
 
-  if (!req.files || !req.files.image) {
-    return res.status(400).json({ result: false, error: "No file uploaded" });
-  }
-  const photoPath = `./temp/${uniqid()}.jpg`;
-  const resultMove = await req.files.image.mv(photoPath);
+  try {
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ result: false, error: "No file uploaded" });
+    }
 
-  if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-    const updatedUser = await User.findOneAndUpdate(
-      { token: token },
-      { profilePic: resultCloudinary.secure_url },
-      { new: true }
-    );
-    res.json({
-      result: true,
-      url: resultCloudinary.secure_url,
-      user: updatedUser,
-    });
-  } else {
-    res.json({ result: false, error: resultMove });
-  }
+    const photoPath = `./temp/${uniqid()}.jpg`;
+    const resultMove = await req.files.image.mv(photoPath);
 
-  fs.unlinkSync(photoPath);
+    if (!resultMove) {
+      const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+      const updatedUser = await User.findOneAndUpdate(
+        { token: token },
+        { profilePic: resultCloudinary.secure_url },
+        { new: true }
+      );
+      res.json({
+        result: true,
+        url: resultCloudinary.secure_url,
+        user: updatedUser,
+      });
+    } else {
+      res.json({ result: false, error: resultMove });
+    }
+
+    fs.unlinkSync(photoPath);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ result: false, error: "Internal server error" });
+  }
 });
 
 
@@ -176,55 +183,55 @@ router.post('/reset-password', (req, res) => { // route pour envoyer le mail con
   const { email } = req.body;                  //Gère l'envoi d'un e-mail de réinitialisation de mot de passe en recherchant l'utilisateur par e-mail et envoyant un e-mail de réinitialisation avec un lien, le cas échéant.
 
   if (!email) {
-    return res.status(400).send('Email requis');
+    return res.status(400).send("Email requis");
   }
 
   User.findOne({ email: email })
-    .then(user => {
+    .then((user) => {
       if (!user) {
-        return res.status(404).send('Utilisateur non trouvé');
+        return res.status(404).send("Utilisateur non trouvé");
       }
 
-     
-      const userToken = user.token; 
+      const userToken = user.token;
 
       return sendPasswordChangeEmail(email, userToken)
         .then(() => {
-          console.log('E-mail envoyé avec succès');
-          res.status(200).send('E-mail de réinitialisation envoyé avec succès.');
+          console.log("E-mail envoyé avec succès");
+          res
+            .status(200)
+            .send("E-mail de réinitialisation envoyé avec succès.");
         })
         .catch((error) => {
-          console.error('Erreur lors de l\'envoi de l\'e-mail:', error.toString());
-          res.status(500).send('Erreur lors de l\'envoi de l\'e-mail.');
+          console.error(
+            "Erreur lors de l'envoi de l'e-mail:",
+            error.toString()
+          );
+          res.status(500).send("Erreur lors de l'envoi de l'e-mail.");
+          console.error(
+            "Erreur lors de l'envoi de l'e-mail:",
+            error.toString()
+          );
+          res.status(500).send("Erreur lors de l'envoi de l'e-mail.");
         });
     })
-    .catch(err => {
-      console.error('Erreur lors de la recherche de l\'utilisateur:', err);
-      res.status(500).send('Erreur lors de la recherche de l\'utilisateur');
+    .catch((err) => {
+      console.error("Erreur lors de la recherche de l'utilisateur:", err);
+      res.status(500).send("Erreur lors de la recherche de l'utilisateur");
     });
 });
-
-
 
 function sendPasswordChangeEmail(email, token) {
   const passwordChangeUrl = `http://localhost:3001/ResetPasswordPageWrapped?token=${token}`;
 
   const msg = {
     to: email,
-    from: 'radio@snuagless.com', 
-    subject: 'Réinitialisation de mot de passe',
-    text: 'Voici votre e-mail de réinitialisation de mot de passe.',
+    from: "radio@snuagless.com",
+    subject: "Réinitialisation de mot de passe",
+    text: "Voici votre e-mail de réinitialisation de mot de passe.",
     html: `<p>Cliquez sur ce lien pour changer votre mot de passe : <a href="${passwordChangeUrl}">${passwordChangeUrl}</a></p>`,
   };
 
   return sgMail.send(msg);
 }
-
-
-
-
-
-
-
 
 module.exports = router;
