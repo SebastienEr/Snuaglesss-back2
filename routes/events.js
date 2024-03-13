@@ -19,7 +19,7 @@ router.get("/getevents", (req, res) => {
     });
 });
 
-router.post("/events", (req, res) => {
+router.post("/getevents", (req, res) => {
   // envoyer des titres/programmes en BDD
   fetch(
     "https://api.radioking.io/widget/radio/radio-snuagless/track/ckoi?limit=1"
@@ -30,34 +30,32 @@ router.post("/events", (req, res) => {
       Event.findOne({
         started_at: data.started_at,
         end_at: data.end_at,
-      }).then((existingEvent) => {
-        if (!existingEvent) {
-          const newEvent = new Event({
-            artist: data[0].artist,
-            title: data[0].title,
-            album: data[0].album,
-            started_at: data[0].started_at,
-            end_at: data[0].end_at,
-            duration: data[0].duration,
-            is_live: data[0].is_live,
-            cover: data[0].cover,
-            default_cover: data[0].default_cover,
-            forced_title: data[0].forced_title,
-          });
-          // Enregistrer le nouveau programme dans la base de données
-          newEvent
-            .save()
-            .then((newEv) => {
-              res.json({ result: true, event: newEv });
-            })
-            .catch((error) => {
-              res.status(500).json({
-                result: false,
-                message: "Error saving the event.",
-                error: error,
-              });
+      }).then(() => {
+        const newEvent = new Event({
+          artist: data[0].artist,
+          title: data[0].title,
+          album: data[0].album,
+          started_at: data[0].started_at,
+          end_at: data[0].end_at,
+          duration: data[0].duration,
+          is_live: data[0].is_live,
+          cover: data[0].cover,
+          default_cover: data[0].default_cover,
+          forced_title: data[0].forced_title,
+        });
+        // Enregistrer le nouveau programme dans la base de données
+        newEvent
+          .save()
+          .then((newEv) => {
+            res.json({ result: true, event: newEv });
+          })
+          .catch((error) => {
+            res.status(500).json({
+              result: false,
+              message: "Error saving the event.",
+              error: error,
             });
-        }
+          });
       });
     })
     .catch((error) => {
@@ -69,7 +67,7 @@ router.post("/events", (req, res) => {
     });
 });
 
-router.get("/eventsByHour", async (req, res) => {
+/* router.get("/eventsByHour", async (req, res) => {
   try {
     // Fetch the current track information
     const response = await fetch(
@@ -98,6 +96,6 @@ router.get("/eventsByHour", async (req, res) => {
       message: "An error occurred while fetching the event.",
     });
   }
-});
+}); */
 
 module.exports = router;

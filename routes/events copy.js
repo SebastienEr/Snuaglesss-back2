@@ -1,4 +1,4 @@
-require("dotenv").config(); // module .env
+/* require("dotenv").config(); // module .env
 var express = require("express");
 var router = express.Router();
 
@@ -109,4 +109,4 @@ router.post("/events", (req, res) => {
   }
 }); */
 
-module.exports = router;
+/* module.exports = router;  */
