@@ -4,13 +4,13 @@ const eventSchema = mongoose.Schema({
   artist: String,
   title: String,
   album: String,
-  startedAt: String, // Date et heure de début
-  endAt: String, // Date et heure de fin
+  started_at: String, // Date et heure de début
+  end_at: String, // Date et heure de fin
   duration: Number, // Durée du programme
-  isLive: Boolean, // en live / pas en live
+  is_live: Boolean, // en live / pas en live
   cover: String, // url pochette album
-  defaultCover: Boolean, // pochette affichée / pas affichée
-  forcedTitle: Boolean, // ?
+  default_cover: Boolean, // pochette affichée / pas affichée
+  forced_title: Boolean, // ?
 });
 
 const Event = mongoose.model("events", eventSchema);
