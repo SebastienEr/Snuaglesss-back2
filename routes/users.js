@@ -6,6 +6,7 @@ require("../models/connection");
 require("dotenv").config(); 
 
 const User = require("../models/users");
+const musicSchema = require("../models/musicschema");
 // const { checkBody } = require("../modules/checkBody");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -68,6 +69,7 @@ router.post("/signup", (req, res) => {
           image: null,
           token: uid2(32),
           verificationToken: verificationToken,
+          favoriteMusics: req.body.favoriteMusics || []
         });
 
         newUser.save().then((newDoc) => {
@@ -175,6 +177,79 @@ router.post("/upload/:token", async (req, res) => {
     res.status(500).json({ result: false, error: "Internal server error" });
   }
 });
+
+
+
+// router.post("/favorites", async (req, res) => {
+//   console.log("5", req, res)
+//   try {
+//     console.log("6", req, res)
+//     // Find the user by the token
+//     const user = await User.findOne({ username: req.body.username });
+
+//     if (!user) {
+//       return res.status(404).json({ message: "cjhc" });
+//     }
+
+//     const newSong = {
+//       title: req.body.title,
+//       cover: req.body.cover,
+//     };
+
+//     user.favoriteMusics.push(newSong);
+//     await user.save();
+
+//     res.status(200).json({ message: "Song added to favorites", newSong });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
+
+
+router.post("/favorites", async (req, res) => {
+  console.log("Processing request", req.body);
+
+  // Adjusting to get username from req.body.test.username
+  const username = req.body.test.username;
+  console.log("Username", username);
+
+  try {
+    // Find the user by username
+    const user = await User.findOne({ username: username });
+
+    // Log for debugging purposes
+    console.log("User found", user);
+
+    if (!user) {
+      // User not found scenario
+      return res.json({ result: false, error: "Utilisateur introuvable" });
+    } else {
+      // Constructing newSong from the request body
+      const newSong = {
+        title: req.body.title,
+        cover: req.body.cover,
+      };
+
+      // Adding new song to user's favorite musics
+      user.favoriteMusics.push(newSong);
+      await user.save();
+
+      // Success response
+      res.json({ result: true, message: "Song added to favorites", newSong });
+    }
+  } catch (error) {
+    console.error("Error processing request", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
+
+
 
 
 

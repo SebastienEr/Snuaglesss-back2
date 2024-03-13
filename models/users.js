@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const musicSchema = require("./musicschema");
 
 const userSchema = mongoose.Schema({
   username: String,
@@ -39,7 +40,11 @@ const userSchema = mongoose.Schema({
 
   verificationToken: {
     type: String,
+    
   },
+  favoriteMusics: [musicSchema],
+  
+  
 });
 
 const User = mongoose.model("users", userSchema);
