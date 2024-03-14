@@ -6,7 +6,7 @@ require("../models/connection");
 require("dotenv").config(); 
 
 const User = require("../models/users");
-const musicSchema = require("../models/musicschema");
+const Music = require('../models/musicschema');
 // const { checkBody } = require("../modules/checkBody");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -180,71 +180,100 @@ router.post("/upload/:token", async (req, res) => {
 
 
 
-// router.post("/favorites", async (req, res) => {
-//   console.log("5", req, res)
-//   try {
-//     console.log("6", req, res)
-//     // Find the user by the token
-//     const user = await User.findOne({ username: req.body.username });
+router.post("/favorites", async (req, res) => {
+  
+  
+  const username = req.body.test.username
+  console.log("5", req, res)
+  try {
+    console.log("6", req, res)
+    // Find the user by the token
+    const user = await User.findOne({ username: username });
+  
 
+    const newSong = {
+      title: req.body.test.title,
+      cover: req.body.test.cover,
+      
+    };
+    console.log( "QQQQQQQQQQQQQQ" ,newSong)
+    
+
+    user.favoriteMusics.push(newSong);
+    await user.save();
+
+    res.status(200).json({ message: "Song added to favorites", newSong });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// router.get("/favorites", async (req, res) => {
+//   const username = req.query.username;
+
+//   try {
+//     const user = await User.findOne({ username: username }).populate('favoriteMusics');
+    
 //     if (!user) {
-//       return res.status(404).json({ message: "cjhc" });
+//       return res.status(404).json({ message: "User not found" });
 //     }
 
-//     const newSong = {
-//       title: req.body.title,
-//       cover: req.body.cover,
-//     };
-
-//     user.favoriteMusics.push(newSong);
-//     await user.save();
-
-//     res.status(200).json({ message: "Song added to favorites", newSong });
+//     res.status(200).json({ favoriteMusics: user.favoriteMusics });
 //   } catch (error) {
 //     console.error(error);
 //     res.status(500).json({ message: "Server error" });
 //   }
 // });
 
+// router.get('/favoritess', (req, res) => {
+//   res.json({ favoriteMusics: favoriteMusicsData });
+// });
 
 
-router.post("/favorites", async (req, res) => {
-  console.log("Processing request", req.body);
 
-  // Adjusting to get username from req.body.test.username
-  const username = req.body.test.username;
-  console.log("Username", username);
 
+
+// Route GET pour récupérer les musiques favorites
+
+
+// Route GET pour récupérer les musiques favorites d'un utilisateur par son nom d'utilisateur
+router.get('/favorites/:username', async (req, res) => {
+  const username = req.params.username;
   try {
-    // Find the user by username
-    const user = await User.findOne({ username: username });
-
-    // Log for debugging purposes
-    console.log("User found", user);
-
+    const user = await User.findOne({ username }).populate('favoriteMusics');
     if (!user) {
-      // User not found scenario
-      return res.json({ result: false, error: "Utilisateur introuvable" });
-    } else {
-      // Constructing newSong from the request body
-      const newSong = {
-        title: req.body.title,
-        cover: req.body.cover,
-      };
-
-      // Adding new song to user's favorite musics
-      user.favoriteMusics.push(newSong);
-      await user.save();
-
-      // Success response
-      res.json({ result: true, message: "Song added to favorites", newSong });
+      return res.status(404).json({ message: "User not found" });
     }
+    res.json({ favoriteMusics: user.favoriteMusics });
   } catch (error) {
-    console.error("Error processing request", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error fetching favorite musics:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
+
+
+
+
+
+
+
+
+
+
+// router.post("/favorites", async (req, res) => {
+//   const username = req.body.test.username
+//   console.log(username)
+// User.findOne({ username: username }).then((user) => {
+//   console.log("9", user)
+//   if (!user) {
+//     res.json({ result: false, error: "Utilisateur introuvable" });
+//   } else {
+//     res.json({ result: true, error: "oui" });
+//   }
+// });
+// });
 
 
 
