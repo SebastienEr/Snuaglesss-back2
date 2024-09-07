@@ -1,12 +1,10 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
 
-const dbURL =
-  "mongodb+srv://admin2:KAWABUNGA@cluster0.nu2rhsw.mongodb.net/snuagless-radio";
+const dbURL = process.env.CONNECTION_STRING;
 
 mongoose
-  .connect(
-    "mongodb+srv://admin2:KAWABUNGA@cluster0.nu2rhsw.mongodb.net/snuagless-radio"
-  )
+  .connect(dbURL)
   .then(() => {
     console.log("Connexion à la base de données réussie");
   })

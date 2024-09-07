@@ -14,9 +14,9 @@ const sgMail = require("@sendgrid/mail");
 
 
 
-sgMail.setApiKey(
-  "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"
-);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY); //
+
+
 
 function checkBody(body, fields) {
   return fields.every((field) => body.hasOwnProperty(field) && body[field]);
@@ -209,32 +209,13 @@ router.post("/favorites", async (req, res) => {
   }
 });
 
-// router.get("/favorites", async (req, res) => {
-//   const username = req.query.username;
-
-//   try {
-//     const user = await User.findOne({ username: username }).populate('favoriteMusics');
-    
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     res.status(200).json({ favoriteMusics: user.favoriteMusics });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
-
-// router.get('/favoritess', (req, res) => {
-//   res.json({ favoriteMusics: favoriteMusicsData });
-// });
 
 
 
 
 
-// Route GET pour récupérer les musiques favorites
+
+
 
 
 // Route GET pour récupérer les musiques favorites d'un utilisateur par son nom d'utilisateur
